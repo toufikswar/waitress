@@ -1,0 +1,10 @@
+2022-05-22 09:10:54,964 - fuser - INFO - Initiating RAs Salesforce Library Loader
+2022-05-22 09:10:54,964 - fuser.parser.JsonParser - INFO - Initiating the JSON Parser Object
+2022-05-22 09:10:54,964 - fuser.parser.JsonParser - DEBUG - JSON file located in /Users/tswar/PycharmProjects/ra-repo-parser/data/RemoteActions/
+2022-05-22 09:10:55,104 - fuser.parser.JsonParser - INFO - Categories successfully loaded from /Users/tswar/PycharmProjects/ra-repo-parser/categories_last.xlsx
+2022-05-22 09:10:55,210 - fuser.salesforce.Salesforce - DEBUG - Initiating Salesforce API object
+2022-05-22 09:10:55,731 - fuser.salesforce.Salesforce - DEBUG - Bearer token retrieved.
+2022-05-22 09:10:55,731 - fuser.salesforce.Salesforce - DEBUG - Header updated with Bearer token and Content-Type
+2022-05-22 09:10:56,046 - fuser.salesforce.Salesforce - DEBUG - GET request successfully executed.
+2022-05-22 09:10:56,046 - fuser.salesforce.Salesforce - INFO - No records found. RA Library is empty
+2022-05-22 09:10:56,047 - fuser.salesforce.Salesforce - INFO - No records to delete.

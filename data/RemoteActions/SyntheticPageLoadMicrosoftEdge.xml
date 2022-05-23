@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Action UID="732fd974-aa3f-e505-a3f5-78a2ad114e4b" SyntaxVersion="10" DataModelVersion="13" Name="Synthetic Page Load Microsoft Edge" AutomaticScheduling="disabled" Description="Invokes the execution of URLs through Microsoft Edge based on URLs set in the input parameter, after 30 seconds Microsoft Edge will be closed.">
+  <Target>
+    <Selector></Selector>
+    <Investigation>
+      <Label></Label>
+      <Type>source</Type>
+      <Description />
+    </Investigation>
+    <InvestigationRaw>
+        </InvestigationRaw>
+  </Target>
+  <ScriptInfo RunAs="interactiveUser" Timeout="120">
+      <WindowsScript Hash="f37e02e5e39839b5a022f149019dcdbef35289d653cf0091dc0d4e4c5d955aae">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</WindowsScript>
+        <Inputs>
+                    <Input Name="URLsToLoad" Value="&quot;&quot;" UsedBy="WindowsScript" />
+                </Inputs>
+    <Outputs>
+    </Outputs>
+  </ScriptInfo>
+  <Schedule>
+    <EvaluationFrequency>60</EvaluationFrequency>
+    <ExecutionFrequency>60</ExecutionFrequency>
+  </Schedule>
+  <ManualTrigger Type="all" Status="disabled" IsMultiDevicesTriggerable="true">
+    <Selector>select source</Selector>
+  </ManualTrigger>
+  <Purpose>2</Purpose>
+  </Action>

@@ -1,0 +1,52 @@
+2022-05-20 15:50:10,333 - fuser - INFO - Initiating RAs Salesforce Library Loader
+2022-05-20 15:50:10,333 - fuser.parser.JsonParser - INFO - Initiating the JSON Parser Object
+2022-05-20 15:50:10,333 - fuser.parser.JsonParser - DEBUG - JSON file located in /Users/tswar/PycharmProjects/ra-repo-parser/data/RemoteActions/
+2022-05-20 15:50:10,512 - fuser.parser.JsonParser - INFO - Categories successfully loaded from /Users/tswar/PycharmProjects/ra-repo-parser/categories-sample.xlsx
+2022-05-20 15:50:10,660 - fuser.salesforce.Salesforce - DEBUG - Initiating Salesforce API object
+2022-05-20 15:50:11,181 - fuser.salesforce.Salesforce - DEBUG - Bearer token retrieved.
+2022-05-20 15:50:11,181 - fuser.salesforce.Salesforce - DEBUG - Header updated with Bearer token and Content-Type
+2022-05-20 15:50:11,199 - fuser.salesforce.Salesforce - DEBUG - Creating record for Get Secure Boot Status
+2022-05-20 15:50:11,764 - fuser.salesforce.Salesforce - ERROR - 400 Client Error: Bad Request for url: https://nexthink--luis.my.salesforce.com/services/data/v54.0/sobjects/Remote_Action__c/
+Traceback (most recent call last):
+  File "/Users/tswar/PycharmProjects/ra-repo-parser/classes/salesforce.py", line 111, in _run_post_request
+    response.raise_for_status()
+  File "/Users/tswar/PycharmProjects/ra-repo-parser/venv/lib/python3.9/site-packages/requests/models.py", line 960, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://nexthink--luis.my.salesforce.com/services/data/v54.0/sobjects/Remote_Action__c/
+2022-05-20 15:50:11,768 - fuser.salesforce.Salesforce - INFO - Cannot create record for Get Secure Boot Status.
+2022-05-20 15:50:11,768 - fuser.salesforce.Salesforce - DEBUG - Creating record for Get OneDrive Information
+2022-05-20 15:50:12,353 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:12,353 - fuser.salesforce.Salesforce - DEBUG - Record created with success for Get OneDrive Information
+2022-05-20 15:50:12,353 - fuser.salesforce.Salesforce - DEBUG - Uploading file /Users/tswar/PycharmProjects/ra-repo-parser/data/RemoteActions/GetOneDriveInformation.json
+2022-05-20 15:50:23,123 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:23,123 - fuser.salesforce.Salesforce - DEBUG - RA file successfully upload for  Get OneDrive Information
+2022-05-20 15:50:23,123 - fuser.salesforce.Salesforce - DEBUG - Granting file the view permissions
+2022-05-20 15:50:24,455 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:24,455 - fuser.salesforce.Salesforce - INFO - Get OneDrive Information was loaded to Salesforce successfully.
+2022-05-20 15:50:24,456 - fuser.salesforce.Salesforce - DEBUG - Creating record for Get Chrome Plugins
+2022-05-20 15:50:27,955 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:27,955 - fuser.salesforce.Salesforce - DEBUG - Record created with success for Get Chrome Plugins
+2022-05-20 15:50:27,956 - fuser.salesforce.Salesforce - DEBUG - Uploading file /Users/tswar/PycharmProjects/ra-repo-parser/data/RemoteActions/GetChromePlugins.json
+2022-05-20 15:50:29,780 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:29,780 - fuser.salesforce.Salesforce - DEBUG - RA file successfully upload for  Get Chrome Plugins
+2022-05-20 15:50:29,780 - fuser.salesforce.Salesforce - DEBUG - Granting file the view permissions
+2022-05-20 15:50:30,904 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:30,904 - fuser.salesforce.Salesforce - INFO - Get Chrome Plugins was loaded to Salesforce successfully.
+2022-05-20 15:50:30,905 - fuser.salesforce.Salesforce - DEBUG - Creating record for Get BitLocker Information
+2022-05-20 15:50:31,183 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:31,183 - fuser.salesforce.Salesforce - DEBUG - Record created with success for Get BitLocker Information
+2022-05-20 15:50:31,184 - fuser.salesforce.Salesforce - DEBUG - Uploading file /Users/tswar/PycharmProjects/ra-repo-parser/data/RemoteActions/GetBitLockerInformation.json
+2022-05-20 15:50:32,542 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:32,542 - fuser.salesforce.Salesforce - DEBUG - RA file successfully upload for  Get BitLocker Information
+2022-05-20 15:50:32,542 - fuser.salesforce.Salesforce - DEBUG - Granting file the view permissions
+2022-05-20 15:50:33,293 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:33,293 - fuser.salesforce.Salesforce - INFO - Get BitLocker Information was loaded to Salesforce successfully.
+2022-05-20 15:50:33,293 - fuser.salesforce.Salesforce - DEBUG - Creating record for Get Outlook Storage Info
+2022-05-20 15:50:33,772 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:33,772 - fuser.salesforce.Salesforce - DEBUG - Record created with success for Get Outlook Storage Info
+2022-05-20 15:50:33,772 - fuser.salesforce.Salesforce - DEBUG - Uploading file /Users/tswar/PycharmProjects/ra-repo-parser/data/RemoteActions/GetOutlookStorageInfo.json
+2022-05-20 15:50:35,238 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:35,239 - fuser.salesforce.Salesforce - DEBUG - RA file successfully upload for  Get Outlook Storage Info
+2022-05-20 15:50:35,239 - fuser.salesforce.Salesforce - DEBUG - Granting file the view permissions
+2022-05-20 15:50:36,128 - fuser.salesforce.Salesforce - DEBUG - POST request successfully executed.
+2022-05-20 15:50:36,128 - fuser.salesforce.Salesforce - INFO - Get Outlook Storage Info was loaded to Salesforce successfully.
