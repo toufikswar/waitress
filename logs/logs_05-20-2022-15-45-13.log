@@ -1,4 +1,0 @@
-2022-05-20 15:45:13,461 - fuser - INFO - Initiating RAs Salesforce Library Loader
-2022-05-20 15:45:13,461 - fuser.salesforce.Salesforce - DEBUG - Initiating Salesforce API object
-2022-05-20 15:45:13,815 - fuser.salesforce.Salesforce - DEBUG - Bearer token retrieved.
-2022-05-20 15:45:13,815 - fuser.salesforce.Salesforce - DEBUG - Header updated with Bearer token and Content-Type
