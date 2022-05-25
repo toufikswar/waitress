@@ -1,0 +1,14 @@
+# VENV
+/venv/
+
+# DATA
+/data/
+
+# LOGS
+/logs/*.log
+
+# macOS
+.DS_Store
+
+
+__pycache__
