@@ -15,13 +15,16 @@ def main():
                            "--delete",
                            action="store_true",
                            help="Delete the RA Library database")
-    args = my_parser.parse_args()
 
-    print(args.delete)
+    my_parser.add_argument('-v',
+                           '--verbose',
+                           action='store_true',
+                           help='Enable verbose for debugging')
 
-    logger = Logger()
-    logger.set_level()
-    logger.set_file_handler()
+    args = my_parser.parse_args()  # Parse arguments in command line
+
+    logger = Logger(logging.DEBUG if args.verbose else logging.INFO)
+    logger.set_handler(file=True)
     logger.logger.info("Initiating RAs Salesforce Library Loader")
 
     jason_parser = JsonParser()
