@@ -1,12 +1,11 @@
 import logging
-
 from datetime import datetime
 
 
 class Logger:
 
     def __init__(self, level):
-        self.logger = logging.getLogger("fuser")
+        self.logger = logging.getLogger("waitress")
         self.logger.setLevel(level)
 
     @staticmethod
