@@ -4,11 +4,19 @@
 # DATA
 /data/
 
+# Examples
+examples/
+
 # LOGS
 /logs/*.log
 
 # macOS
 .DS_Store
 
+# ENV file
+.env
+
+# PyCharm files
+.idea/
 
 __pycache__
