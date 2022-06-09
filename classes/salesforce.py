@@ -16,10 +16,8 @@ module_logger = logging.getLogger('waitress.salesforce')
 
 class Salesforce:
     """A Salesforce management class for API
-
     This class provides utilities to manage Salesforce content for the RA Library. It uses CRUD mechanism for
     records.
-
     Attribute:
         - URL_OAUTH_TOKEN(str): the url to get a bearer token
         - URL_QUERY_ALL(str): the url to query all records
@@ -57,9 +55,7 @@ class Salesforce:
     @staticmethod
     def encode_to_b64_string(string):
         """Generate a base64 string
-
-        Utility function to encode string to base64 for URL support.
-
+        Utility function to encode string to base64 for URL support
         :param string: a string
         :type string: str
         :return: the name of the currently active user
@@ -73,7 +69,8 @@ class Salesforce:
     def _create_header(self):
         """ Create the HTTP header
         Method that inserts the bearer token in the header and return the header
-        :return: dict
+        :return: a dict with the header info
+        :rtype: dict
         """
         header = {"Authorization": "Bearer token" + self._bearer_token,
                   "Content-Type": "application/json"}
@@ -104,14 +101,14 @@ class Salesforce:
             self._bearer_token = bearer_token
 
     def _run_http_request(self, request_type, url, payload=None):
-        """
-        Method that runs an HTTP request using requests package
+        """ Method that runs an HTTP request using requests package
+
+        This allows to run a set of HTTP requests using requests package.
 
         :param request_type: The type of request e.g. POST, GET, DELETE
         :param url: the endpoint URL
         :param payload: the payload if any
         :return: An http response
-
         """
         try:
             response = requests.request(request_type, url, headers=self._header, data=payload)
@@ -122,38 +119,6 @@ class Salesforce:
             self.logger.exception(err)
         else:
             self.logger.debug(f"{request_type} request successfully executed.")
-            return response
-
-    def _run_post_request(self, url, payload):
-        """ Run an HTTP POST request
-        :param url: str
-        :param payload: dict
-        :return: response object
-        """
-        try:
-            response = requests.post(url, headers=self._header, data=payload)
-            response.raise_for_status()
-        except HTTPError as http_err:
-            self.logger.exception(http_err)
-        except Exception as err:
-            self.logger.exception(err)
-        else:
-            self.logger.debug("POST request successfully executed.")
-            return response
-
-    def _run_get_request(self, url):
-        """ Run an HTTP GET request
-        :param url: str
-        :return: a response object
-        """
-        try:
-            response = requests.get(url, headers=self._header)
-            response.raise_for_status()
-        except HTTPError as http_err:
-            self.logger.exception(http_err)
-        except Exception as err:
-            self.logger.exception(err)
-        else:
             return response
 
     def _get_all_records(self):
@@ -167,7 +132,6 @@ class Salesforce:
 
         :return: a pandas dataframe with all RA records, otherwise an empty dataframe
         :rtype: pd.DataFrame
-
         """
         all_records_response = self._run_http_request("GET", self.URL_QUERY_ALL)  # Query all existing records
         if all_records_response:  # if request is successful
@@ -210,11 +174,12 @@ class Salesforce:
         """ Create a RA record in the database
 
         Create a record in Salesforce database by creating a JSON payload, providing:
-            * Category__c (must be pre-created in Salesforce)
-            * Description__c (free text to describe the RA)
-            * Details_URL__c (link to the V6 Library documentation)
-            * OS__c (support OS, must be pre-created in Salesforce)
-            * Name (name of the RA, free text)
+        * Category__c (must be pre-created in Salesforce)
+        * Description__c (free text to describe the RA)
+        * Details_URL__c (link to the V6 Library documentation)
+        * OS__c (support OS, must be pre-created in Salesforce)
+        * Name (name of the RA, free text).
+
         :param df_row: a dataframe row
         :type df_row: pd.Series
         :return: a response object if success, None otherwise
@@ -248,7 +213,8 @@ class Salesforce:
             * Description__c (free text to describe the RA)
             * Details_URL__c (link to the V6 Library documentation)
             * OS__c (support OS, must be pre-created in Salesforce)
-            * Name (name of the RA, free text)
+            * Name (name of the RA, free text).
+
         :param df_row: a dataframe row
         :type df_row: pd.Series
         :return: a response object if success, None otherwise
@@ -279,25 +245,24 @@ class Salesforce:
             return file_upload_response
 
     def _grant_permission(self, create_record_response, file_upload_response):
-        """Grant the public permission to the upload JSON file.
-
-        Parameters
-        ----------
-        create_record_response
-            Human readable string describing the exception.
-        file_upload_response
-            Numeric error code.
-
-        Returns
-        -------
-        object
-            requests.Response(), otherwise None
+        """ Grant view permissions to the uploaded JSON file.
+        This allows to grant permissions to the uploaded file in order to make it accessible and downloadable
+        by the registered Library users. It works in the following way:
+            * First we query the API to get the Content Document ID
+            * We parse the returned response in order to extract the id content_id
+            * We create a payload adding the content_id and the record_id (from record creation step)
+            * We run a POST request on an endpoint to grant the permissions
+        :param create_record_response: an API response coming from record creation in SF
+        :type create_record_response: requests.Response
+        :param file_upload_response: an API response from the file upload step, used to extract the content_id
+        :type file_upload_response: requests.Response
+        :return: None
         """
         try:
             self.logger.debug(f"Granting file the view permissions")
             create_record_json = create_record_response.json()
             file_upload_json = file_upload_response.json()
-            file_perm_url = self.URL_CONTENT_DOC_ID.format(file_upload_json["id"])
+            file_perm_url = self.URL_CONTENT_DOC_ID.format(file_upload_json["id"])  # get content doc ID of a document
             content_id_response = self._run_http_request("GET", file_perm_url)
         except AttributeError as attrErr:
             self.logger.exception(attrErr)
@@ -314,7 +279,7 @@ class Salesforce:
 
         try:
             content_id_json = content_id_response.json()
-            content_id = content_id_json["records"][0]["ContentDocumentId"]
+            content_id = content_id_json["records"][0]["ContentDocumentId"]  # parse the repose obj to get the ID
             file_perm_dict = {
                 "ContentDocumentId": content_id,
                 "ShareType": "V",
@@ -337,13 +302,11 @@ class Salesforce:
 
     def delete_one_ra(self, record_id: str) -> bool:
         """ Delete a RA record in Salesforce
-
         Runs an HTTP DELETE request on the endpoint to delete a specific record
         :param record_id: the ID of the RA record
         :type record_id: str
         :return: True if the deletion was a success, False otherwise
         :rtype: bool
-
         """
         self.logger.debug(f"Deleting RA with ID {record_id}")
         url_delete = self.URL_DELETE_ONE.format(record_id)
@@ -362,7 +325,6 @@ class Salesforce:
 
     def delete_all_ras(self):
         """ Delete all the records in salesforce
-
         Method that deletes all the records in Salesforce. It does the following:
             * Check if self.existing_records is not empty (i.e. RA DB is not empty)
             * Create a string with all concatenated RA Salesforce IDs
@@ -372,7 +334,6 @@ class Salesforce:
             * If all items are deleted return True
         :return: True if delete successful False otherwise
         :rtype: bool
-
         """
         df = self.existing_records
         if not df.empty:
@@ -387,7 +348,7 @@ class Salesforce:
             delete_json = delete_response.json()
             failed_deletion_ids = [item["id"] for item in delete_json if not item["success"]]
             if failed_deletion_ids:
-                self.logger.error(f"Failed to delete the records with IDs  {failed_deletion_ids['id']}")
+                self.logger.error(f"Failed to delete the records with IDs  {failed_deletion_ids}")
             if len(failed_deletion_ids) == len(df.index):
                 self.logger.info("All records were deleted from the RA Library")
             return True
@@ -397,24 +358,22 @@ class Salesforce:
 
     def process_dataframe(self, df, from_scratch):
         """ Process the dataframe provide, creating records in Salesforce
-
         The process works in the following way.
             * from_scratch parameters deletes all RA records of the Salesforce DB. The option is provided by the user
             * Before creating a record we check if it already exists. If it does, we delete it and recreate it as per
             the newer version provided
-        :param df:
-        :param from_scratch:
-        :param replace_existing:
-        :return:
+        :param df: a dataframe with full data (from JSON + categories file)
+        :param from_scratch: if True recreate DB from scratch
+        :type from_scratch: bool
+        :return: None
         """
-        if from_scratch:
+        if from_scratch:  # Recreate DB from scratch
             delete_status = self.delete_all_ras()
             if not delete_status:
                 self.logger.error("Unable to create the RA database from scratch. Waitress will exit.")
                 exit(1)
             self._existing_records = pd.DataFrame()
-
-        for index, row in df.iterrows():
+        for index, row in df.iterrows():  # Loop over full DB
             if not self.existing_records.empty:
                 if row["Name"] in self.existing_records["Name"].values:
                     id_record_to_delete = self.existing_records. \
@@ -425,19 +384,17 @@ class Salesforce:
                     if not deletion_status:  # If we cannot delete the record, we go to next record
                         self.logger.error(f"Couldn't delete record for {row['Name']}")
                         continue
-            # RA record creation
+            # RA record creation in SF
             self.logger.debug(f"Creating record for RA Name : {row['Name']}")
             create_record_response = self._create_ra_record(row)
-            if not create_record_response:  # If no response exists
+            if not create_record_response:
                 self.logger.error(f"Cannot reach endpoint to create record for RA Name : {row['Name']}")
                 continue
-
-            if not create_record_response.json()["success"]:  # If creation not successful
+            if not create_record_response.json()["success"]:  # If creation not successful, next record
                 self.logger.error(f"Cannot create record for RA Name : {row['Name']}")
                 continue
             self.logger.debug(f"Record created with success for RA Name : {row['Name']}")
-
-            # RA file upload
+            # RA JSON file upload
             self.logger.debug(f"Uploading JSON file for RA Name : {row['Name']}")
             file_upload_response = self._upload_json_file(row)
             if not file_upload_response:
@@ -447,8 +404,7 @@ class Salesforce:
                 self.logger.error(f"Cannot upload file for RA Name : {row['Name']}")
                 continue
             self.logger.debug(f"RA JSON file successfully upload for RA Name : {row['Name']}")
-
-            # Granting record permissions
+            # Granting record permissions in SF
             self.logger.debug(f"Granting permission for record for RA Name : {row['Name']}")
             file_perm_response = self._grant_permission(create_record_response, file_upload_response)
             if not file_perm_response:
