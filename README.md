@@ -8,3 +8,5 @@ To run python waitress.py --params
 - `--from_scratch` or `-fs` create all the DB from scratch
 - `--verbose` or `-v` extra verbose for debugging
 - `--save` or `-s` save full DB to Excel
+
+![alt text](https://cdn-icons-png.flaticon.com/512/1995/1995590.png "image Title")
