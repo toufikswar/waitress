@@ -1,13 +1,15 @@
-import pandas
 import pandas as pd
-import requests
+import numpy as np
+
 import json
 import base64
 import os
 import logging
+import math
 
 from typing import List
 from decouple import config
+import requests
 from requests.exceptions import HTTPError
 
 
@@ -19,38 +21,37 @@ class Salesforce:
     This class provides utilities to manage Salesforce content for the RA Library. It uses CRUD mechanism for
     records.
     Attribute:
-        - URL_OAUTH_TOKEN(str): the url to get a bearer token
-        - URL_QUERY_ALL(str): the url to query all records
-        - URL_TO_RECORD(str): the url to query one record
-        - URL_FILE_UPLOAD(str): the url to upload a file
         - URL_CONTENT_DOC_ID(str): the url to get the Content Document ID
         - URL_GRANT_PERMISSION(str): the url to grant the file public permission
     """
     # Class attributes for Authentication and URLs
-    URL_OAUTH_TOKEN = config("URL_OAUTH_TOKEN")
-    URL_QUERY_ALL = config("URL_QUERY_ALL")
-    URL_DELETE_ALL = config("URL_DELETE_ALL")
-    URL_DELETE_ONE = config("URL_DELETE_ONE")
-    URL_TO_RECORD = config("URL_TO_RECORD")
-    URL_FILE_UPLOAD = config("URL_FILE_UPLOAD")
-    URL_CONTENT_DOC_ID = config("URL_CONTENT_DOC_ID")
-    URL_GRANT_PERMISSION = config("URL_GRANT_PERMISSION")
     #  Class attributes for credentials
-    GRANT_TYPE = config("GRANT_TYPE")
-    CLIENT_ID = config("CLIENT_ID")
-    CLIENT_SECRET = config("CLIENT_SECRET")
-    USERNAME = config("USERNAME")
-    PASSWORD = config("PASSWORD")
 
-    def __init__(self):
+    def __init__(self, config_file):
         self.logger = logging.getLogger("waitress.salesforce.Salesforce")
         self.logger.debug("Initiating Salesforce API object")
+        self._load_config(config_file)  # Load configuration
         self._bearer_token = None
         self._header = None
 
         self._get_bearer_token()  # We update the self._bearer_token with a new token
         self._create_header()  # We update the self._header with token and content type
         self._existing_records = self._get_all_records()  # get all existing records in Salesforce
+
+    def _load_config(self, config_file):
+        self._url_oauth_token = config_file.get("url_oauth_token")
+        self._url_query_all = config_file.get("url_query_all")
+        self._url_delete_all = config_file.get("url_delete_all")
+        self._url_delete_one = config_file.get("url_delete_one")
+        self._url_to_record = config_file.get("url_to_record")
+        self._url_file_upload = config_file.get("url_file_upload")
+        self._url_content_doc_id = config_file.get("url_content_doc_id")
+        self._url_grant_permission = config_file.get("url_grant_permission")
+        self._grant_type = config_file.get("grant_type")
+        self._client_id = config_file.get("client_id")
+        self._client_secret = config_file.get("client_secret")
+        self._username = config_file.get("username")
+        self._password = config_file.get("password")
 
     @staticmethod
     def encode_to_b64_string(string):
@@ -81,10 +82,10 @@ class Salesforce:
         """ Get the Bearer token from Salesforce instance
         :return: str
         """
-        payload = {"grant_type": self.GRANT_TYPE, "client_id": self.CLIENT_ID, "client_secret": self.CLIENT_SECRET,
-                   "username": self.USERNAME, "password": self.PASSWORD}
+        payload = {"grant_type": self._grant_type, "client_id": self._client_id, "client_secret": self._client_secret,
+                   "username": self._username, "password": self._password}
         try:
-            oauth_response = requests.post(self.URL_OAUTH_TOKEN, data=payload)
+            oauth_response = requests.post(self._url_oauth_token, data=payload)
             oauth_response.raise_for_status()
         except HTTPError as http_err:
             self.logger.exception(http_err)
@@ -133,14 +134,14 @@ class Salesforce:
         :return: a pandas dataframe with all RA records, otherwise an empty dataframe
         :rtype: pd.DataFrame
         """
-        all_records_response = self._run_http_request("GET", self.URL_QUERY_ALL)  # Query all existing records
+        all_records_response = self._run_http_request("GET", self._url_query_all)  # Query all existing records
         if all_records_response:  # if request is successful
             if all_records_response.json()["totalSize"] > 0:  # if there are records
                 all_records_json = all_records_response.json()  # we create a JSON from the response
                 records = all_records_json["records"]  # Extract records information
                 list_records = []
                 for record in records:  # Loop over the existing records
-                    record_url = self.URL_TO_RECORD + record["Id"]  # Create a URL to query a record for a specific ID
+                    record_url = self._url_to_record + record["Id"]  # Create a URL to query a record for a specific ID
                     response_record = self._run_http_request("GET", record_url)  # Query data for a specific record
                     if not response_record:  # If we cannot get the record data, go to next record
                         self.logger.error(f"Cannot get record for {record['ID']}")
@@ -202,7 +203,7 @@ class Salesforce:
             return
         else:
             create_record_json = json.dumps(create_record_dict, indent=4)
-            create_record_response = self._run_http_request("POST", self.URL_TO_RECORD, payload=create_record_json)
+            create_record_response = self._run_http_request("POST", self._url_to_record, payload=create_record_json)
             return create_record_response
 
     def _upload_json_file(self, df_row):
@@ -241,7 +242,7 @@ class Salesforce:
             return
         else:
             file_upload_json = json.dumps(file_upload_dict, indent=4)
-            file_upload_response = self._run_http_request("POST", self.URL_FILE_UPLOAD, payload=file_upload_json)
+            file_upload_response = self._run_http_request("POST", self._url_file_upload, payload=file_upload_json)
             return file_upload_response
 
     def _grant_permission(self, create_record_response, file_upload_response):
@@ -262,7 +263,7 @@ class Salesforce:
             self.logger.debug(f"Granting file the view permissions")
             create_record_json = create_record_response.json()
             file_upload_json = file_upload_response.json()
-            file_perm_url = self.URL_CONTENT_DOC_ID.format(file_upload_json["id"])  # get content doc ID of a document
+            file_perm_url = self._url_content_doc_id.format(file_upload_json["id"])  # get content doc ID of a document
             content_id_response = self._run_http_request("GET", file_perm_url)
         except AttributeError as attrErr:
             self.logger.exception(attrErr)
@@ -297,7 +298,7 @@ class Salesforce:
             return
         else:
             file_perm_json = json.dumps(file_perm_dict, indent=4)
-            file_perm_response = self._run_http_request("POST", self.URL_GRANT_PERMISSION, payload=file_perm_json)
+            file_perm_response = self._run_http_request("POST", self._url_grant_permission, payload=file_perm_json)
             return file_perm_response
 
     def delete_one_ra(self, record_id: str) -> bool:
@@ -309,7 +310,7 @@ class Salesforce:
         :rtype: bool
         """
         self.logger.debug(f"Deleting RA with ID {record_id}")
-        url_delete = self.URL_DELETE_ONE.format(record_id)
+        url_delete = self._url_delete_one.format(record_id)
         delete_response = self._run_http_request("DELETE", url_delete, None)
         try:
             delete_json = delete_response.json()
@@ -338,19 +339,22 @@ class Salesforce:
         df = self.existing_records
         if not df.empty:
             self.logger.info(f"There are {len(df.index)} RA records in the RA Library.")
-            record_ids_list = df.loc[:, "Id"].to_list()
-            records_str = ",".join(record_ids_list)
-            delete_all_url = self.URL_DELETE_ALL + records_str + "&allOrNone=false"
-            delete_response = self._run_http_request("DELETE", delete_all_url, None)
-            if not delete_response:
-                self.logger.error("Couldn't delete records in Salesforce. Check the endpoint URL or API access.")
-                return False
-            delete_json = delete_response.json()
-            failed_deletion_ids = [item["id"] for item in delete_json if not item["success"]]
-            if failed_deletion_ids:
-                self.logger.error(f"Failed to delete the records with IDs  {failed_deletion_ids}")
-            if len(failed_deletion_ids) == len(df.index):
-                self.logger.info("All records were deleted from the RA Library")
+            num_groups = math.ceil(len(df.index)/200)
+            df_chunks = np.array_split(df, num_groups)
+            for df_chunk in df_chunks:
+                record_ids_list = df_chunk.loc[:, "Id"].to_list()
+                records_str = ",".join(record_ids_list)
+                delete_all_url = self._url_delete_all + records_str + "&allOrNone=false"
+                delete_response = self._run_http_request("DELETE", delete_all_url, None)
+                if not delete_response:
+                    self.logger.error("Couldn't delete records in Salesforce. Check the endpoint URL or API access.")
+                    return False
+                delete_json = delete_response.json()
+                failed_deletion_ids = [item["id"] for item in delete_json if not item["success"]]
+                if failed_deletion_ids:
+                    self.logger.error(f"Failed to delete the records with IDs  {failed_deletion_ids}")
+                if len(failed_deletion_ids) == len(df.index):
+                    self.logger.info("All records were deleted from the RA Library")
             return True
         else:
             self.logger.info("No records to delete.")

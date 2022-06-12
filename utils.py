@@ -1,4 +1,10 @@
 import base64
+import json
+
+
+def load_config(path_to_json):
+    with open(path_to_json, "r") as f:
+        return json.load(f)
 
 
 def encode_to_b64_string(*args):

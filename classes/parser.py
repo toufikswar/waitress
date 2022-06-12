@@ -11,16 +11,21 @@ module_logger = logging.getLogger('waitress.parser')
 
 class JsonParser:
 
-    PATH_TO_JSON = config("PATH_TO_JSON")
-    EXCEL_FILE_CATEGORIES = config("EXCEL_FILE_CATEGORIES")
-
-    def __init__(self):
+    def __init__(self, config_file):
         self.logger = logging.getLogger("waitress.parser.JsonParser")  # Initialize the logger object
-        self.logger.info(f"Initiating the JSON Parser Object - Will parse JSON files in {self.PATH_TO_JSON}")
+        self._load_config(config_file)  # Load configuration
+
+        self.logger.info(f"Initiating the JSON Parser Object - Will parse JSON files in {self._path_to_json}")
         self._df_category = self._load_data_categories()  # Load RAs categories from Excel file
 
         self._df_json = pd.DataFrame()  # Df to store data from JSON files
         self._df_all = pd.DataFrame()  # Df to merge JSON file data with Category Excel file
+
+
+    def _load_config(self, config_file):
+        self.logger.info(f"Instantiating Parser Object with {config_file['env']} configuration")
+        self._path_to_json = config_file["path_to_json"]
+        self._remote_actions_metadata = config_file["remote_actions_metadata"]
 
     def _load_data_categories(self):
         """
@@ -29,8 +34,8 @@ class JsonParser:
         :return: a dataframe
         """
         try:
-            self.logger.info(f"Loading RA metadata from {self.EXCEL_FILE_CATEGORIES}")
-            df_category = pd.read_excel(self.EXCEL_FILE_CATEGORIES, index_col=0)
+            self.logger.info(f"Loading RA metadata from {self._remote_actions_metadata}")
+            df_category = pd.read_excel(self._remote_actions_metadata, index_col=0)
         except FileNotFoundError as fileErr:
             self.logger.exception(fileErr)
             self.logger.error("Couldn't load categories data - check path to Excel file. Waitress will close.")
@@ -44,21 +49,21 @@ class JsonParser:
             self.logger.error("Couldn't load categories data - check path to Excel file. Waitress will close.")
             exit(1)
         else:
-            self.logger.info(f"Categories successfully loaded from : {self.EXCEL_FILE_CATEGORIES}")
+            self.logger.info(f"Categories successfully loaded from : {self._remote_actions_metadata}")
             return df_category
 
     def parse_json_folder(self):
         """
-        Parse the JSON folder specified in .env, retrieve RA metadata info and store it in self._df_json
+        Parse the JSON folder specified in prod.env, retrieve RA metadata info and store it in self._df_json
 
         :return: None
         """
         try:
-            if not os.path.exists(self.PATH_TO_JSON):
-                self.logger.error(f"JSON Folder {self.PATH_TO_JSON} do not exists. Make sure it does.")
+            if not os.path.exists(self._path_to_json):
+                self.logger.error(f"JSON Folder {self._path_to_json} do not exists. Make sure it does.")
                 exit(1)
             ra_list = []
-            for root, dirs, files in os.walk(self.PATH_TO_JSON):
+            for root, dirs, files in os.walk(self._path_to_json):
                 for filename in files:
                     file_fullpath = os.path.join(root, filename)
                     if filename.endswith(".json"):

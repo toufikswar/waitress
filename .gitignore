@@ -13,10 +13,13 @@ examples/
 # macOS
 .DS_Store
 
-# ENV file
-.env
+# ENV file & config
+*.env
+prod.env
+*.json
 
 # PyCharm files
 .idea/
 
 __pycache__
+
