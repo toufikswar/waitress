@@ -39,7 +39,6 @@ def main():
     logger.set_handler(file=True)
     logger.logger.info("Initiating RAs Salesforce Library Loader")
 
-
     jason_parser = JsonParser(prog_config)
     jason_parser.parse_json_folder()  # Parse the JSON folder to extract metadata
 
