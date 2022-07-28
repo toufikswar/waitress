@@ -18,6 +18,9 @@ examples/
 prod.env
 *.json
 
+# Documentation
+/docs/
+
 # PyCharm files
 .idea/
 
