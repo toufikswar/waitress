@@ -15,6 +15,7 @@ examples/
 
 # ENV file & config
 *.env
+.env
 prod.env
 *.json
 
